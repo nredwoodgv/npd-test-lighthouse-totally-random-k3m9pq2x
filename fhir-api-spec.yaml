@@ -1,0 +1,78 @@
+openapi: 3.0.1
+info:
+  title: HealthLake FHIR API
+  description: FHIR R4 API backed by AWS HealthLake
+  version: 1.0.0
+servers:
+  - url: https://jpyxjsts35.execute-api.us-east-1.amazonaws.com/prod
+    description: Production
+paths:
+  /Patient:
+    get:
+      summary: Search patients
+      parameters:
+        - name: family
+          in: query
+          schema:
+            type: string
+        - name: given
+          in: query
+          schema:
+            type: string
+        - name: birthdate
+          in: query
+          schema:
+            type: string
+        - name: gender
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Bundle of matching patients
+        '401':
+          description: Unauthorized
+  /Patient/{id}:
+    get:
+      summary: Get patient by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Patient resource
+        '404':
+          description: Not found
+  /Observation:
+    get:
+      summary: Search observations
+      parameters:
+        - name: patient
+          in: query
+          schema:
+            type: string
+        - name: code
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Bundle of observations
+  /MedicationRequest:
+    get:
+      summary: Search medication requests
+      parameters:
+        - name: patient
+          in: query
+          schema:
+            type: string
+        - name: status
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Bundle of medication requests
