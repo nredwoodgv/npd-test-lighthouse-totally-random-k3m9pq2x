@@ -1,78 +1,275 @@
 openapi: 3.0.1
 info:
-  title: HealthLake FHIR API
-  description: FHIR R4 API backed by AWS HealthLake
+  title: NPD TEST
+  description: NPD Beta testing
   version: 1.0.0
 servers:
   - url: https://jpyxjsts35.execute-api.us-east-1.amazonaws.com/prod
-    description: Production
+tags:
+  - name: Endpoint
+    description: Endpoint resources
+  - name: Location
+    description: Location resources
+  - name: Organization
+    description: Organization resources
+  - name: OrganizationAffiliation
+    description: Organization affiliation resources
+  - name: Practitioner
+    description: Practitioner resources
+  - name: PractitionerRole
+    description: Practitioner role resources
 paths:
-  /Patient:
+  /Endpoint:
     get:
-      summary: Search patients
+      tags: [Endpoint]
+      summary: Search endpoints
+      operationId: searchEndpoints
       parameters:
-        - name: family
+        - name: name
           in: query
-          schema:
-            type: string
-        - name: given
+          description: Endpoint name
+          schema: { type: string }
+        - name: status
           in: query
-          schema:
-            type: string
-        - name: birthdate
+          description: active | suspended | error | off | entered-in-error | test
+          schema: { type: string }
+        - name: organization
           in: query
-          schema:
-            type: string
-        - name: gender
+          description: Organization that manages this endpoint
+          schema: { type: string }
+        - name: connection-type
           in: query
-          schema:
-            type: string
+          description: Protocol/connection type e.g. hl7-fhir-rest
+          schema: { type: string }
       responses:
-        '200':
-          description: Bundle of matching patients
-        '401':
-          description: Unauthorized
-  /Patient/{id}:
+        '200': { description: Bundle of endpoints }
+        '400': { description: Bad request }
+        '500': { description: Server error }
+  /Endpoint/{id}:
     get:
-      summary: Get patient by ID
+      tags: [Endpoint]
+      summary: Get endpoint by ID
+      operationId: getEndpoint
       parameters:
         - name: id
           in: path
           required: true
-          schema:
-            type: string
+          schema: { type: string }
       responses:
-        '200':
-          description: Patient resource
-        '404':
-          description: Not found
-  /Observation:
+        '200': { description: Endpoint resource }
+        '404': { description: Endpoint not found }
+  /Location:
     get:
-      summary: Search observations
+      tags: [Location]
+      summary: Search locations
+      operationId: searchLocations
       parameters:
-        - name: patient
+        - name: name
           in: query
-          schema:
-            type: string
-        - name: code
-          in: query
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Bundle of observations
-  /MedicationRequest:
-    get:
-      summary: Search medication requests
-      parameters:
-        - name: patient
-          in: query
-          schema:
-            type: string
+          description: Location name
+          schema: { type: string }
         - name: status
           in: query
-          schema:
-            type: string
+          description: active | suspended | inactive
+          schema: { type: string }
+        - name: address-city
+          in: query
+          description: City of the location
+          schema: { type: string }
+        - name: address-state
+          in: query
+          description: State of the location
+          schema: { type: string }
+        - name: type
+          in: query
+          description: Type of location e.g. HOSP, CLINIC, PHU
+          schema: { type: string }
+        - name: organization
+          in: query
+          description: Managing organization
+          schema: { type: string }
       responses:
-        '200':
-          description: Bundle of medication requests
+        '200': { description: Bundle of locations }
+        '400': { description: Bad request }
+        '500': { description: Server error }
+  /Location/{id}:
+    get:
+      tags: [Location]
+      summary: Get location by ID
+      operationId: getLocation
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: Location resource }
+        '404': { description: Location not found }
+  /Organization:
+    get:
+      tags: [Organization]
+      summary: Search organizations
+      operationId: searchOrganizations
+      parameters:
+        - name: name
+          in: query
+          description: Organization name
+          schema: { type: string }
+        - name: type
+          in: query
+          description: Type of organization e.g. prov, dept, govt
+          schema: { type: string }
+        - name: address-city
+          in: query
+          description: City of the organization
+          schema: { type: string }
+        - name: address-state
+          in: query
+          description: State of the organization
+          schema: { type: string }
+      responses:
+        '200': { description: Bundle of organizations }
+        '400': { description: Bad request }
+        '500': { description: Server error }
+  /Organization/{id}:
+    get:
+      tags: [Organization]
+      summary: Get organization by ID
+      operationId: getOrganization
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: Organization resource }
+        '404': { description: Organization not found }
+  /OrganizationAffiliation:
+    get:
+      tags: [OrganizationAffiliation]
+      summary: Search organization affiliations
+      operationId: searchOrganizationAffiliations
+      parameters:
+        - name: primary-organization
+          in: query
+          description: Primary organization ID
+          schema: { type: string }
+        - name: participating-organization
+          in: query
+          description: Participating organization ID
+          schema: { type: string }
+        - name: role
+          in: query
+          description: Role of the participating organization
+          schema: { type: string }
+        - name: specialty
+          in: query
+          description: Specialty of the participating organization
+          schema: { type: string }
+        - name: location
+          in: query
+          description: Location ID
+          schema: { type: string }
+        - name: network
+          in: query
+          description: Health insurance provider network
+          schema: { type: string }
+      responses:
+        '200': { description: Bundle of organization affiliations }
+        '400': { description: Bad request }
+        '500': { description: Server error }
+  /OrganizationAffiliation/{id}:
+    get:
+      tags: [OrganizationAffiliation]
+      summary: Get organization affiliation by ID
+      operationId: getOrganizationAffiliation
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: OrganizationAffiliation resource }
+        '404': { description: OrganizationAffiliation not found }
+  /Practitioner:
+    get:
+      tags: [Practitioner]
+      summary: Search practitioners
+      operationId: searchPractitioners
+      parameters:
+        - name: name
+          in: query
+          description: Practitioner name
+          schema: { type: string }
+        - name: family
+          in: query
+          description: Family/last name
+          schema: { type: string }
+        - name: given
+          in: query
+          description: Given/first name
+          schema: { type: string }
+        - name: identifier
+          in: query
+          description: Practitioner identifier e.g. NPI
+          schema: { type: string }
+      responses:
+        '200': { description: Bundle of practitioners }
+        '400': { description: Bad request }
+        '500': { description: Server error }
+  /Practitioner/{id}:
+    get:
+      tags: [Practitioner]
+      summary: Get practitioner by ID
+      operationId: getPractitioner
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: Practitioner resource }
+        '404': { description: Practitioner not found }
+  /PractitionerRole:
+    get:
+      tags: [PractitionerRole]
+      summary: Search practitioner roles
+      operationId: searchPractitionerRoles
+      parameters:
+        - name: practitioner
+          in: query
+          description: Practitioner ID
+          schema: { type: string }
+        - name: organization
+          in: query
+          description: Organization ID
+          schema: { type: string }
+        - name: role
+          in: query
+          description: Role code e.g. doctor, nurse, pharmacist
+          schema: { type: string }
+        - name: specialty
+          in: query
+          description: Practitioner specialty
+          schema: { type: string }
+        - name: location
+          in: query
+          description: Location ID
+          schema: { type: string }
+      responses:
+        '200': { description: Bundle of practitioner roles }
+        '400': { description: Bad request }
+        '500': { description: Server error }
+  /PractitionerRole/{id}:
+    get:
+      tags: [PractitionerRole]
+      summary: Get practitioner role by ID
+      operationId: getPractitionerRole
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: PractitionerRole resource }
+        '404': { description: PractitionerRole not found }

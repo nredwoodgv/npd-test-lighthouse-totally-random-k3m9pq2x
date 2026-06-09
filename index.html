@@ -1,13 +1,85 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>HealthLake FHIR API</title>
+  <title>NPD TEST</title>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist/swagger-ui.css">
+  <style>
+    :root {
+      --npd-red: #c9525f;
+      --npd-red-soft: #e8b4ba;
+      --npd-bg: #faf7f7;
+      --npd-text: #2a2a2a;
+    }
+
+    body {
+      margin: 0;
+      background: var(--npd-bg);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      color: var(--npd-text);
+    }
+
+    .npd-header {
+      background: linear-gradient(135deg, #ffffff 0%, #fdf5f6 100%);
+      border-bottom: 3px solid var(--npd-red);
+      padding: 32px 48px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+
+    .npd-header h1 {
+      margin: 0 0 8px 0;
+      font-size: 32px;
+      font-weight: 600;
+      color: #000000;
+      letter-spacing: -0.5px;
+    }
+
+    .npd-header p {
+      margin: 0;
+      font-size: 16px;
+      color: var(--npd-red);
+      opacity: 0.85;
+      font-weight: 500;
+    }
+
+    .npd-header .npd-hint {
+      margin-top: 12px;
+      font-size: 13px;
+      color: #6b6b6b;
+      font-weight: 400;
+    }
+
+    /* Hide Swagger's default top bar and server selector to keep the UI clean */
+    .swagger-ui .topbar { display: none; }
+    .swagger-ui .scheme-container { display: none; }
+    .swagger-ui .info { display: none; }
+
+    /* Tighten the main content area */
+    .swagger-ui {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px 48px 48px 48px;
+    }
+
+    /* Soften the operation blocks (keep Swagger's default colors) */
+    .swagger-ui .opblock {
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+      margin-bottom: 12px;
+    }
+  </style>
 </head>
 <body>
+
+<div class="npd-header">
+  <h1>NPD TEST</h1>
+  <p>NPD Beta testing</p>
+  <div class="npd-hint">Expand an endpoint below, click <strong>Try it out</strong>, fill in parameters, and hit <strong>Execute</strong>.</div>
+</div>
+
 <div id="swagger-ui"></div>
+
 <script src="https://unpkg.com/swagger-ui-dist/swagger-ui-bundle.js"></script>
 <script>
   SwaggerUIBundle({
@@ -17,6 +89,8 @@
     layout: "BaseLayout",
     deepLinking: true,
     persistAuthorization: true,
+    docExpansion: "list",
+    defaultModelsExpandDepth: -1,
     requestInterceptor: (request) => {
       request.headers['Content-Type'] = 'application/fhir+json';
       return request;

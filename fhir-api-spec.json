@@ -1,25 +1,33 @@
 {
   "openapi": "3.0.1",
   "info": {
-    "title": "HealthLake FHIR API",
-    "description": "FHIR R4 API backed by AWS HealthLake",
+    "title": "NPD TEST",
+    "description": "NPD Beta testing",
     "version": "1.0.0"
   },
   "servers": [
     {
-      "url": "https://jpyxjsts35.execute-api.us-east-1.amazonaws.com/prod",
-      "description": "Production"
+      "url": "https://jpyxjsts35.execute-api.us-east-1.amazonaws.com/prod"
     }
+  ],
+  "tags": [
+    { "name": "Endpoint",                "description": "Endpoint resources" },
+    { "name": "Location",                "description": "Location resources" },
+    { "name": "Organization",            "description": "Organization resources" },
+    { "name": "OrganizationAffiliation", "description": "Organization affiliation resources" },
+    { "name": "Practitioner",            "description": "Practitioner resources" },
+    { "name": "PractitionerRole",        "description": "Practitioner role resources" }
   ],
   "paths": {
     "/Endpoint": {
       "get": {
+        "tags": ["Endpoint"],
         "summary": "Search endpoints",
         "operationId": "searchEndpoints",
         "parameters": [
-          { "name": "name", "in": "query", "description": "Endpoint name", "schema": { "type": "string" } },
-          { "name": "status", "in": "query", "description": "active | suspended | error | off | entered-in-error | test", "schema": { "type": "string" } },
-          { "name": "organization", "in": "query", "description": "Organization that manages this endpoint", "schema": { "type": "string" } },
+          { "name": "name",            "in": "query", "description": "Endpoint name", "schema": { "type": "string" } },
+          { "name": "status",          "in": "query", "description": "active | suspended | error | off | entered-in-error | test", "schema": { "type": "string" } },
+          { "name": "organization",    "in": "query", "description": "Organization that manages this endpoint", "schema": { "type": "string" } },
           { "name": "connection-type", "in": "query", "description": "Protocol/connection type e.g. hl7-fhir-rest", "schema": { "type": "string" } }
         ],
         "responses": {
@@ -31,6 +39,7 @@
     },
     "/Endpoint/{id}": {
       "get": {
+        "tags": ["Endpoint"],
         "summary": "Get endpoint by ID",
         "operationId": "getEndpoint",
         "parameters": [
@@ -44,15 +53,16 @@
     },
     "/Location": {
       "get": {
+        "tags": ["Location"],
         "summary": "Search locations",
         "operationId": "searchLocations",
         "parameters": [
-          { "name": "name", "in": "query", "description": "Location name", "schema": { "type": "string" } },
-          { "name": "status", "in": "query", "description": "active | suspended | inactive", "schema": { "type": "string" } },
-          { "name": "address-city", "in": "query", "description": "City of the location", "schema": { "type": "string" } },
+          { "name": "name",          "in": "query", "description": "Location name", "schema": { "type": "string" } },
+          { "name": "status",        "in": "query", "description": "active | suspended | inactive", "schema": { "type": "string" } },
+          { "name": "address-city",  "in": "query", "description": "City of the location", "schema": { "type": "string" } },
           { "name": "address-state", "in": "query", "description": "State of the location", "schema": { "type": "string" } },
-          { "name": "type", "in": "query", "description": "Type of location e.g. HOSP, CLINIC, PHU", "schema": { "type": "string" } },
-          { "name": "organization", "in": "query", "description": "Managing organization", "schema": { "type": "string" } }
+          { "name": "type",          "in": "query", "description": "Type of location e.g. HOSP, CLINIC, PHU", "schema": { "type": "string" } },
+          { "name": "organization",  "in": "query", "description": "Managing organization", "schema": { "type": "string" } }
         ],
         "responses": {
           "200": { "description": "Bundle of locations", "content": { "application/fhir+json": { "schema": { "$ref": "#/components/schemas/Bundle" } } } },
@@ -63,6 +73,7 @@
     },
     "/Location/{id}": {
       "get": {
+        "tags": ["Location"],
         "summary": "Get location by ID",
         "operationId": "getLocation",
         "parameters": [
@@ -76,12 +87,13 @@
     },
     "/Organization": {
       "get": {
+        "tags": ["Organization"],
         "summary": "Search organizations",
         "operationId": "searchOrganizations",
         "parameters": [
-          { "name": "name", "in": "query", "description": "Organization name", "schema": { "type": "string" } },
-          { "name": "type", "in": "query", "description": "Type of organization e.g. prov, dept, govt", "schema": { "type": "string" } },
-          { "name": "address-city", "in": "query", "description": "City of the organization", "schema": { "type": "string" } },
+          { "name": "name",          "in": "query", "description": "Organization name", "schema": { "type": "string" } },
+          { "name": "type",          "in": "query", "description": "Type of organization e.g. prov, dept, govt", "schema": { "type": "string" } },
+          { "name": "address-city",  "in": "query", "description": "City of the organization", "schema": { "type": "string" } },
           { "name": "address-state", "in": "query", "description": "State of the organization", "schema": { "type": "string" } }
         ],
         "responses": {
@@ -93,6 +105,7 @@
     },
     "/Organization/{id}": {
       "get": {
+        "tags": ["Organization"],
         "summary": "Get organization by ID",
         "operationId": "getOrganization",
         "parameters": [
@@ -106,15 +119,16 @@
     },
     "/OrganizationAffiliation": {
       "get": {
+        "tags": ["OrganizationAffiliation"],
         "summary": "Search organization affiliations",
         "operationId": "searchOrganizationAffiliations",
         "parameters": [
-          { "name": "primary-organization", "in": "query", "description": "Primary organization ID", "schema": { "type": "string" } },
+          { "name": "primary-organization",       "in": "query", "description": "Primary organization ID", "schema": { "type": "string" } },
           { "name": "participating-organization", "in": "query", "description": "Participating organization ID", "schema": { "type": "string" } },
-          { "name": "role", "in": "query", "description": "Role of the participating organization", "schema": { "type": "string" } },
-          { "name": "specialty", "in": "query", "description": "Specialty of the participating organization", "schema": { "type": "string" } },
-          { "name": "location", "in": "query", "description": "Location ID", "schema": { "type": "string" } },
-          { "name": "network", "in": "query", "description": "Health insurance provider network", "schema": { "type": "string" } }
+          { "name": "role",                       "in": "query", "description": "Role of the participating organization", "schema": { "type": "string" } },
+          { "name": "specialty",                  "in": "query", "description": "Specialty of the participating organization", "schema": { "type": "string" } },
+          { "name": "location",                   "in": "query", "description": "Location ID", "schema": { "type": "string" } },
+          { "name": "network",                    "in": "query", "description": "Health insurance provider network", "schema": { "type": "string" } }
         ],
         "responses": {
           "200": { "description": "Bundle of organization affiliations", "content": { "application/fhir+json": { "schema": { "$ref": "#/components/schemas/Bundle" } } } },
@@ -125,6 +139,7 @@
     },
     "/OrganizationAffiliation/{id}": {
       "get": {
+        "tags": ["OrganizationAffiliation"],
         "summary": "Get organization affiliation by ID",
         "operationId": "getOrganizationAffiliation",
         "parameters": [
@@ -138,12 +153,13 @@
     },
     "/Practitioner": {
       "get": {
+        "tags": ["Practitioner"],
         "summary": "Search practitioners",
         "operationId": "searchPractitioners",
         "parameters": [
-          { "name": "name", "in": "query", "description": "Practitioner name", "schema": { "type": "string" } },
-          { "name": "family", "in": "query", "description": "Family/last name", "schema": { "type": "string" } },
-          { "name": "given", "in": "query", "description": "Given/first name", "schema": { "type": "string" } },
+          { "name": "name",       "in": "query", "description": "Practitioner name", "schema": { "type": "string" } },
+          { "name": "family",     "in": "query", "description": "Family/last name", "schema": { "type": "string" } },
+          { "name": "given",      "in": "query", "description": "Given/first name", "schema": { "type": "string" } },
           { "name": "identifier", "in": "query", "description": "Practitioner identifier e.g. NPI", "schema": { "type": "string" } }
         ],
         "responses": {
@@ -155,6 +171,7 @@
     },
     "/Practitioner/{id}": {
       "get": {
+        "tags": ["Practitioner"],
         "summary": "Get practitioner by ID",
         "operationId": "getPractitioner",
         "parameters": [
@@ -168,14 +185,15 @@
     },
     "/PractitionerRole": {
       "get": {
+        "tags": ["PractitionerRole"],
         "summary": "Search practitioner roles",
         "operationId": "searchPractitionerRoles",
         "parameters": [
           { "name": "practitioner", "in": "query", "description": "Practitioner ID", "schema": { "type": "string" } },
           { "name": "organization", "in": "query", "description": "Organization ID", "schema": { "type": "string" } },
-          { "name": "role", "in": "query", "description": "Role code e.g. doctor, nurse, pharmacist", "schema": { "type": "string" } },
-          { "name": "specialty", "in": "query", "description": "Practitioner specialty", "schema": { "type": "string" } },
-          { "name": "location", "in": "query", "description": "Location ID", "schema": { "type": "string" } }
+          { "name": "role",         "in": "query", "description": "Role code e.g. doctor, nurse, pharmacist", "schema": { "type": "string" } },
+          { "name": "specialty",    "in": "query", "description": "Practitioner specialty", "schema": { "type": "string" } },
+          { "name": "location",     "in": "query", "description": "Location ID", "schema": { "type": "string" } }
         ],
         "responses": {
           "200": { "description": "Bundle of practitioner roles", "content": { "application/fhir+json": { "schema": { "$ref": "#/components/schemas/Bundle" } } } },
@@ -186,6 +204,7 @@
     },
     "/PractitionerRole/{id}": {
       "get": {
+        "tags": ["PractitionerRole"],
         "summary": "Get practitioner role by ID",
         "operationId": "getPractitionerRole",
         "parameters": [
@@ -204,15 +223,15 @@
         "type": "object",
         "properties": {
           "resourceType": { "type": "string", "example": "Bundle" },
-          "type": { "type": "string", "example": "searchset" },
-          "total": { "type": "integer", "example": 1 },
+          "type":         { "type": "string", "example": "searchset" },
+          "total":        { "type": "integer", "example": 1 },
           "entry": {
             "type": "array",
             "items": {
               "type": "object",
               "properties": {
                 "resource": { "type": "object" },
-                "search": { "type": "object", "properties": { "mode": { "type": "string", "example": "match" } } }
+                "search":   { "type": "object", "properties": { "mode": { "type": "string", "example": "match" } } }
               }
             }
           }
