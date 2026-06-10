@@ -1,4 +1,3 @@
-openapi: 3.0.1
 info:
   title: NPD TEST
   description: NPD Beta testing
@@ -21,255 +20,582 @@ tags:
 paths:
   /Endpoint:
     get:
-      tags: [Endpoint]
+      tags:
+        - Endpoint
       summary: Search endpoints
       operationId: searchEndpoints
       parameters:
+        - name: _id
+          in: query
+          description: Logical ID of the resource
+          schema:
+            type: string
         - name: name
           in: query
           description: Endpoint name
-          schema: { type: string }
+          schema:
+            type: string
         - name: status
           in: query
           description: active | suspended | error | off | entered-in-error | test
-          schema: { type: string }
+          schema:
+            type: string
         - name: organization
           in: query
           description: Organization that manages this endpoint
-          schema: { type: string }
+          schema:
+            type: string
         - name: connection-type
           in: query
           description: Protocol/connection type e.g. hl7-fhir-rest
-          schema: { type: string }
+          schema:
+            type: string
+        - name: _include
+          in: query
+          description: 'Include referenced resources. Example: Endpoint:organization'
+          schema:
+            type: string
+        - name: _count
+          in: query
+          description: Number of results per page (default 10, max 100)
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
       responses:
-        '200': { description: Bundle of endpoints }
-        '400': { description: Bad request }
-        '500': { description: Server error }
+        '200':
+          description: Bundle of endpoints
+          content:
+            application/fhir+json:
+              schema:
+                $ref: '#/components/schemas/Bundle'
+        '400':
+          description: Bad request
+        '500':
+          description: Server error
   /Endpoint/{id}:
     get:
-      tags: [Endpoint]
+      tags:
+        - Endpoint
       summary: Get endpoint by ID
       operationId: getEndpoint
       parameters:
         - name: id
           in: path
           required: true
-          schema: { type: string }
+          schema:
+            type: string
       responses:
-        '200': { description: Endpoint resource }
-        '404': { description: Endpoint not found }
+        '200':
+          description: Endpoint resource
+        '404':
+          description: Endpoint not found
   /Location:
     get:
-      tags: [Location]
+      tags:
+        - Location
       summary: Search locations
       operationId: searchLocations
       parameters:
+        - name: _id
+          in: query
+          description: Logical ID of the resource
+          schema:
+            type: string
         - name: name
           in: query
           description: Location name
-          schema: { type: string }
+          schema:
+            type: string
         - name: status
           in: query
           description: active | suspended | inactive
-          schema: { type: string }
+          schema:
+            type: string
         - name: address-city
           in: query
           description: City of the location
-          schema: { type: string }
+          schema:
+            type: string
         - name: address-state
           in: query
           description: State of the location
-          schema: { type: string }
+          schema:
+            type: string
         - name: type
           in: query
           description: Type of location e.g. HOSP, CLINIC, PHU
-          schema: { type: string }
+          schema:
+            type: string
         - name: organization
           in: query
           description: Managing organization
-          schema: { type: string }
+          schema:
+            type: string
+        - name: partOf
+          in: query
+          description: Return locations that are part of the given parent Location
+          schema:
+            type: string
+        - name: _include
+          in: query
+          description: >-
+            Include referenced resources. Examples: Location:partOf,
+            Location:organization
+          schema:
+            type: string
+        - name: _revinclude
+          in: query
+          description: >-
+            Include resources that reference these locations. Example:
+            Location:partOf to include child locations
+          schema:
+            type: string
+        - name: _count
+          in: query
+          description: Number of results per page (default 10, max 100)
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
       responses:
-        '200': { description: Bundle of locations }
-        '400': { description: Bad request }
-        '500': { description: Server error }
+        '200':
+          description: Bundle of locations
+          content:
+            application/fhir+json:
+              schema:
+                $ref: '#/components/schemas/Bundle'
+        '400':
+          description: Bad request
+        '500':
+          description: Server error
   /Location/{id}:
     get:
-      tags: [Location]
+      tags:
+        - Location
       summary: Get location by ID
       operationId: getLocation
       parameters:
         - name: id
           in: path
           required: true
-          schema: { type: string }
+          schema:
+            type: string
       responses:
-        '200': { description: Location resource }
-        '404': { description: Location not found }
+        '200':
+          description: Location resource
+        '404':
+          description: Location not found
   /Organization:
     get:
-      tags: [Organization]
+      tags:
+        - Organization
       summary: Search organizations
       operationId: searchOrganizations
+      description: >
+        Standard FHIR search on the Organization resource.
+
+
+        **Reassembling split organizations**
+
+
+        Organizations with very large `identifier`, `telecom`, `address`, or
+        `contact` arrays are stored as a parent plus N child resources linked
+        via `partOf`. The parent keeps the canonical `id` and identity fields;
+        children carry slices of the bloat arrays and their `id` is
+        `{parent-id}-part-N`.
+
+
+        To retrieve a parent plus all its children in a single call:
+
+
+        ```
+
+        GET /Organization?_id={parent-id}&_revinclude=Organization:partOf
+
+        ```
+
+
+        The response is a Bundle containing the parent and every child part.
+        Client code should merge the `identifier`, `telecom`, `address`, and
+        `contact` arrays across entries to reconstruct the full organization.
+
+
+        To go the other direction (you have a child and want its parent):
+
+
+        ```
+
+        GET /Organization?_id={child-id}&_include=Organization:partOf
+
+        ```
       parameters:
+        - name: _id
+          in: query
+          description: Logical ID of the resource
+          schema:
+            type: string
+          example: Organization-607c2b42-7546-42cb-a4f1-e65a66aaa817
         - name: name
           in: query
           description: Organization name
-          schema: { type: string }
+          schema:
+            type: string
         - name: type
           in: query
           description: Type of organization e.g. prov, dept, govt
-          schema: { type: string }
+          schema:
+            type: string
+        - name: identifier
+          in: query
+          description: >-
+            Identifier in the form system|value, e.g.
+            http://terminology.hl7.org/NamingSystem/npi|1235157751
+          schema:
+            type: string
         - name: address-city
           in: query
           description: City of the organization
-          schema: { type: string }
+          schema:
+            type: string
         - name: address-state
           in: query
           description: State of the organization
-          schema: { type: string }
+          schema:
+            type: string
+        - name: partOf
+          in: query
+          description: Return organizations that are part of the given parent organization
+          schema:
+            type: string
+          example: Organization/Organization-607c2b42-7546-42cb-a4f1-e65a66aaa817
+        - name: _include
+          in: query
+          description: >-
+            Include referenced resources in the response Bundle. Use
+            'Organization:partOf' to include the parent organization.
+          schema:
+            type: string
+            enum:
+              - Organization:partOf
+          example: Organization:partOf
+        - name: _revinclude
+          in: query
+          description: >-
+            Include resources that reference these organizations. Use
+            'Organization:partOf' to include child organizations (the split
+            parts).
+          schema:
+            type: string
+            enum:
+              - Organization:partOf
+          example: Organization:partOf
+        - name: _count
+          in: query
+          description: Number of results per page (default 10, max 100)
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
       responses:
-        '200': { description: Bundle of organizations }
-        '400': { description: Bad request }
-        '500': { description: Server error }
+        '200':
+          description: Bundle of organizations
+          content:
+            application/fhir+json:
+              schema:
+                $ref: '#/components/schemas/Bundle'
+        '400':
+          description: Bad request
+        '500':
+          description: Server error
   /Organization/{id}:
     get:
-      tags: [Organization]
+      tags:
+        - Organization
       summary: Get organization by ID
       operationId: getOrganization
+      description: >-
+        Returns a single Organization resource. Note: if this organization was
+        split across a parent and N children (see `/Organization` search docs),
+        this endpoint returns only the resource with the exact `id` requested.
+        To reassemble the full organization, use `GET
+        /Organization?_id={parent-id}&_revinclude=Organization:partOf` instead.
       parameters:
         - name: id
           in: path
           required: true
-          schema: { type: string }
+          schema:
+            type: string
       responses:
-        '200': { description: Organization resource }
-        '404': { description: Organization not found }
+        '200':
+          description: Organization resource
+        '404':
+          description: Organization not found
   /OrganizationAffiliation:
     get:
-      tags: [OrganizationAffiliation]
+      tags:
+        - OrganizationAffiliation
       summary: Search organization affiliations
       operationId: searchOrganizationAffiliations
       parameters:
+        - name: _id
+          in: query
+          description: Logical ID of the resource
+          schema:
+            type: string
         - name: primary-organization
           in: query
           description: Primary organization ID
-          schema: { type: string }
+          schema:
+            type: string
         - name: participating-organization
           in: query
           description: Participating organization ID
-          schema: { type: string }
+          schema:
+            type: string
         - name: role
           in: query
           description: Role of the participating organization
-          schema: { type: string }
+          schema:
+            type: string
         - name: specialty
           in: query
           description: Specialty of the participating organization
-          schema: { type: string }
+          schema:
+            type: string
         - name: location
           in: query
           description: Location ID
-          schema: { type: string }
+          schema:
+            type: string
         - name: network
           in: query
           description: Health insurance provider network
-          schema: { type: string }
+          schema:
+            type: string
+        - name: _include
+          in: query
+          description: >-
+            Include referenced resources. Examples:
+            OrganizationAffiliation:primary-organization,
+            OrganizationAffiliation:participating-organization,
+            OrganizationAffiliation:location
+          schema:
+            type: string
+        - name: _count
+          in: query
+          description: Number of results per page (default 10, max 100)
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
       responses:
-        '200': { description: Bundle of organization affiliations }
-        '400': { description: Bad request }
-        '500': { description: Server error }
+        '200':
+          description: Bundle of organization affiliations
+          content:
+            application/fhir+json:
+              schema:
+                $ref: '#/components/schemas/Bundle'
+        '400':
+          description: Bad request
+        '500':
+          description: Server error
   /OrganizationAffiliation/{id}:
     get:
-      tags: [OrganizationAffiliation]
+      tags:
+        - OrganizationAffiliation
       summary: Get organization affiliation by ID
       operationId: getOrganizationAffiliation
       parameters:
         - name: id
           in: path
           required: true
-          schema: { type: string }
+          schema:
+            type: string
       responses:
-        '200': { description: OrganizationAffiliation resource }
-        '404': { description: OrganizationAffiliation not found }
+        '200':
+          description: OrganizationAffiliation resource
+        '404':
+          description: OrganizationAffiliation not found
   /Practitioner:
     get:
-      tags: [Practitioner]
+      tags:
+        - Practitioner
       summary: Search practitioners
       operationId: searchPractitioners
       parameters:
+        - name: _id
+          in: query
+          description: Logical ID of the resource
+          schema:
+            type: string
         - name: name
           in: query
           description: Practitioner name
-          schema: { type: string }
+          schema:
+            type: string
         - name: family
           in: query
           description: Family/last name
-          schema: { type: string }
+          schema:
+            type: string
         - name: given
           in: query
           description: Given/first name
-          schema: { type: string }
+          schema:
+            type: string
         - name: identifier
           in: query
           description: Practitioner identifier e.g. NPI
-          schema: { type: string }
+          schema:
+            type: string
+        - name: _revinclude
+          in: query
+          description: >-
+            Include resources that reference these practitioners. Example:
+            PractitionerRole:practitioner
+          schema:
+            type: string
+        - name: _count
+          in: query
+          description: Number of results per page (default 10, max 100)
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
       responses:
-        '200': { description: Bundle of practitioners }
-        '400': { description: Bad request }
-        '500': { description: Server error }
+        '200':
+          description: Bundle of practitioners
+          content:
+            application/fhir+json:
+              schema:
+                $ref: '#/components/schemas/Bundle'
+        '400':
+          description: Bad request
+        '500':
+          description: Server error
   /Practitioner/{id}:
     get:
-      tags: [Practitioner]
+      tags:
+        - Practitioner
       summary: Get practitioner by ID
       operationId: getPractitioner
       parameters:
         - name: id
           in: path
           required: true
-          schema: { type: string }
+          schema:
+            type: string
       responses:
-        '200': { description: Practitioner resource }
-        '404': { description: Practitioner not found }
+        '200':
+          description: Practitioner resource
+        '404':
+          description: Practitioner not found
   /PractitionerRole:
     get:
-      tags: [PractitionerRole]
+      tags:
+        - PractitionerRole
       summary: Search practitioner roles
       operationId: searchPractitionerRoles
       parameters:
+        - name: _id
+          in: query
+          description: Logical ID of the resource
+          schema:
+            type: string
         - name: practitioner
           in: query
           description: Practitioner ID
-          schema: { type: string }
+          schema:
+            type: string
         - name: organization
           in: query
           description: Organization ID
-          schema: { type: string }
+          schema:
+            type: string
         - name: role
           in: query
           description: Role code e.g. doctor, nurse, pharmacist
-          schema: { type: string }
+          schema:
+            type: string
         - name: specialty
           in: query
           description: Practitioner specialty
-          schema: { type: string }
+          schema:
+            type: string
         - name: location
           in: query
           description: Location ID
-          schema: { type: string }
+          schema:
+            type: string
+        - name: _include
+          in: query
+          description: >-
+            Include referenced resources. Examples:
+            PractitionerRole:practitioner, PractitionerRole:organization,
+            PractitionerRole:location
+          schema:
+            type: string
+        - name: _count
+          in: query
+          description: Number of results per page (default 10, max 100)
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
       responses:
-        '200': { description: Bundle of practitioner roles }
-        '400': { description: Bad request }
-        '500': { description: Server error }
+        '200':
+          description: Bundle of practitioner roles
+          content:
+            application/fhir+json:
+              schema:
+                $ref: '#/components/schemas/Bundle'
+        '400':
+          description: Bad request
+        '500':
+          description: Server error
   /PractitionerRole/{id}:
     get:
-      tags: [PractitionerRole]
+      tags:
+        - PractitionerRole
       summary: Get practitioner role by ID
       operationId: getPractitionerRole
       parameters:
         - name: id
           in: path
           required: true
-          schema: { type: string }
+          schema:
+            type: string
       responses:
-        '200': { description: PractitionerRole resource }
-        '404': { description: PractitionerRole not found }
+        '200':
+          description: PractitionerRole resource
+        '404':
+          description: PractitionerRole not found
+components:
+  schemas:
+    Bundle:
+      type: object
+      properties:
+        resourceType:
+          type: string
+          example: Bundle
+        type:
+          type: string
+          example: searchset
+        total:
+          type: integer
+          example: 1
+        entry:
+          type: array
+          items:
+            type: object
+            properties:
+              resource:
+                type: object
+              search:
+                type: object
+                properties:
+                  mode:
+                    type: string
+                    example: match
+
